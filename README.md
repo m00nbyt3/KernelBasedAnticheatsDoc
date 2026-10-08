@@ -1,1 +1,15 @@
-# KernelBasedAnticheatsDoc
+# Research about kernel anticheats
+
+## Contributors
+
+- Daniel Callejo @x0l4dn4
+- Yago Carro @m00nbyt3
+- Miguel Carazo @MiguelitoDelito
+
+## Goals of part 1
+
+- Find technical information on how kernel-level anti-cheat systems work (e.g., BattlEye, Easy Anti-Cheat, Ricochet).
+
+- Investigate the CrowdStrike incident in July 2024.
+
+- Technical report detailing what happened during the incident, its causes, origin, impact, and solution.
