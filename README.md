@@ -2,9 +2,9 @@
 
 ## Contributors
 
-- Daniel Callejo @x0l4dn4
-- Yago Carro @m00nbyt3
-- Miguel Carazo @MiguelitoDelito
+- Daniel Callejo [@x0l4dn4](https://github.com/x0l4dn4)
+- Yago Carro [@m00nbyt3](https://github.com/m00nbyt3)
+- Miguel Carazo [@MiguelitoDelito](https://github.com/MiguelitoDelito)
 
 ## Goals of part 1
 
