@@ -1,6 +1,28 @@
 ## Introduction  
+Sumario ejecutivo: 
 
-The videogame industry consistently has to confront the issue of cheating. This challenge has intensified with technological advancements in gaming, prompting a response from game developers in the form of anti-cheat systems.
+Problem: Online video gaming, particularly competitive gaming and esports, consistently has to confront the issue of cheating. This challenge has intensified with technological advancements in gaming, prompting a response from game developers in the form of sophisticated anti-cheat systems. 
+
+During the last years, there has been an escalation on how cheats are working and upgrading:
+     
+1. Cheats that run in Usermode  
+
+2. Cheats that run at kernel level
+
+3. Kernel cheats with  BYOVD (with a custom vulerable driver)
+
+4. Hypervisor-based cheats
+
+5. DMA Cheats (Direct Memory access) 
+
+6. Firmware-based attacks (SSD, RAM, GPU)
+
+
+ 
+
+Solution: 
+
+Make a kernel-based anticheat:
 
 During the last years, there has been an escalation on how cheats are working and upgrading: 
 
@@ -25,18 +47,41 @@ This was effective against simplistic cheats but trivially bypassed: any process
 
 The fundamental problem with usermode-only anti-cheat is the trust model. Any protection implemented entirely in usermode can be bypassed by anything running at a higher privilege level.
 
-![kernel-rings](img/Priv_rings.png)
+  
 
+The practical implication of boot-time loading is also why Vanguard requires a system reboot to enable: the driver must be in place before the rest of the system initializes, which means it cannot be loaded after the fact without a restart. 
+
+
+The three types of detections  
+
+ 
+Kernel driver: Runs at ring 0. Registers callbacks, intercepts system calls, scans memory, enforces protections. This is the component that actually has the power to do anything meaningful. 
+
+  
+
+Usermode service: Runs as a Windows service, typically with SYSTEM privileges. Communicates with the kernel driver via IOCTLs. Handles network communication with backend servers, manages ban enforcement, collects and transmits telemetry. 
+
+  
+
+Game-injected DLL: Injected into (or loaded by) the game process. Performs usermode-side checks, communicates with the service, and serves as the endpoint for protections applied to the game process specifically. 
+ 
+This 3 things are needed 
+
+Vanguards kernel driver uses a whitelist of future dll loading 
 
 The main difference between the different levels of privilege is the accessibility of memory and instructions. User mode (ring 3) applications are isolated from kernel mode (ring 0) applications, because kernel-mode determines how user-mode behaves, and usermode-mode applications therefore cannot access kernel memory. 
  
 
-## Why kernel mode? 
+When do they load:
+
+BattlEye and EAC Load when the game is launched 
+
+Vanguard is loaded before most of the system has initialized (boot-start driver) 
 
 Kernel-mode cheats could directly manipulate game memory without going through any API that a usermode anti-cheat could intercept. 
  
 
-Kernel anti-cheat deploys as a Windows kernel driver (`.sys` file). the driver is loaded at boot (for persistent systems like `Vanguard`) or at game launch (for on-demand systems). 
+Their detections:
 
 ## Boot-time vs Runtime Driver Loading 
 
@@ -49,49 +94,12 @@ Vanguard loads `vgk.sys` at system boot. The driver is configured as a boot-star
 
 This gives Vanguard a critical advantage: it can observe every driver that loads after it. Any driver that loads after `vgk.sys` can be inspected before its code runs in a meaningful way.
 
-A cheat driver that loads at the normal driver initialization phase is loading into a system that Vanguard already has eyes on. 
+Behavioral Detection and Telemetry (mouse, ML, IA) 
 
-The practical implication of boot-time loading is also why Vanguard requires a system reboot to enable: the driver must be in place before the rest of the system initializes, which means it cannot be loaded after the fact without a restart.
+Anti-VM and Environment Checks 
 
-## The three types of detections (all 3 are needed)
+Hardware Fingerprinting and Ban Enforcement 
 
-- `Kernel driver`: Runs at ring 0. Registers callbacks, intercepts system calls, scans memory, enforces protections. This is the component that actually has the power to do anything meaningful.
-
-- `Usermode service`: Runs as a Windows service, typically with `SYSTEM` privileges. Communicates with the kernel driver via IOCTLs. Handles network communication with backend servers, manages ban enforcement, collects and transmits telemetry.  
-
-- `Game-injected DLL`: Injected into (or loaded by) the game process. Performs usermode-side checks, communicates with the service, and serves as the endpoint for protections applied to the game process specifically.
-
-## Example of how it works (Vanguard)
-
-Once the video game and its associated anti-cheat software are installed, a system process is created (e.g., `vgk.sys` for Riot Vanguard). This process runs in Kernel Ring 0. the system's deepest privilege level—ensuring it loads before any cheats can be launched. 
-
-Next, the executable program (such as `vgc.exe` for Vanguard and Valorant) verifies that the anti-cheat is running, establishing a bridge between the kernel-level process and the game client.
-
-The anti-cheat activates upon system startup; when the game is launched, it checks whether the anti-cheat is running and starts it if it isn't already active.   
-
-![vanguard-cheat-scheme](img/vanguard_cheat_scheme.png)
-
-Once the game client is running, the kernel-level anti-cheat monitors for and blocks malicious data loads, unsigned code, exploits, and code injections.   
-
-Writing to the game's memory is prevented at both Ring 3 and Ring 0 levels.
-
-The anti-cheat performs specific checks to detect analysis tools; if suspicious behavior is detected, it issues a ban based on the machine's `HWID` (Hardware ID). 
-
-The kernel driver uses a whitelist of allowed DLLs. Any other DLL which tries to load will be killed.
-
-#### Anticheat-detections
-
-- Memory Protection and Scanning  
-
-- Anti-Injection Detection  
-
-- Hook Detection  
-
-- Driver-Level Protections  
-
-- Anti-Debug Protections  
-
-- DMA Cheats and Detection
 
 - Behavioral Detection and Telemetry (mouse, ML, IA)  
 
@@ -108,7 +116,10 @@ The kernel driver uses a whitelist of allowed DLLs. Any other DLL which tries to
 
 - [Example EasyAntiCheat Exploit](https://aftermathlabs.net/blog/10/08/2021/) 
 
-- [Hacking Forum - Kernel anticheat analysis](https://hackingfordummies.com/articles/kernel-anticheat-analysis/) 
+
+
+
+Valor: 
 
 - [Wikipedia - Protection rings](https://en.wikipedia.org/wiki/Protection_ring) 
 
@@ -116,4 +127,4 @@ The kernel driver uses a whitelist of allowed DLLs. Any other DLL which tries to
 
 - [Zach Vohries - CrowdStrike Analysis](https://x.com/Perpetualmaniac/status/1814376668095754753)
 
-- [VGK DriverEntry Analysis](https://gist.github.com/gmh5225/2b430b6025c8888196dd95c8557bfc6f)
+	 
