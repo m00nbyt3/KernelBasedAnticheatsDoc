@@ -1,6 +1,28 @@
 ## Introduction  
+Sumario ejecutivo: 
 
-Online video gaming, particularly competitive gaming and esports, consistently has to confront the issue of cheating. This challenge has intensified with technological advancements in gaming, prompting a response from game developers in the form of sophisticated anti-cheat systems. 
+Problem: Online video gaming, particularly competitive gaming and esports, consistently has to confront the issue of cheating. This challenge has intensified with technological advancements in gaming, prompting a response from game developers in the form of sophisticated anti-cheat systems. 
+
+During the last years, there has been an escalation on how cheats are working and upgrading:
+     
+1. Cheats that run in Usermode  
+
+2. Cheats that run at kernel level
+
+3. Kernel cheats with  BYOVD (with a custom vulerable driver)
+
+4. Hypervisor-based cheats
+
+5. DMA Cheats (Direct Memory access) 
+
+6. Firmware-based attacks (SSD, RAM, GPU)
+
+
+ 
+
+Solution: 
+
+Make a kernel-based anticheat:
 
 Architecture of a Kernel Anti-Cheat 
 
@@ -39,26 +61,6 @@ Vanguard loads vgk.sys at system boot. The driver is configured as a boot-start 
 
 The practical implication of boot-time loading is also why Vanguard requires a system reboot to enable: the driver must be in place before the rest of the system initializes, which means it cannot be loaded after the fact without a restart. 
 
- 
-
-Referencias 
-
-s4dbrd - How-kernel-anti-cheats-work 
-
-Why anti-cheat software utilize kernel drivers 
-
-Example 
-
-Hacking Forum - Kernel anticheat analysis 
-
-Wikipedia - Protection rings 
-
-What is a kernel driver 
-
- 
-
-https://s4dbrd.github.io/posts/how-kernel-anti-cheats-work/#8-anti-debug-protections 
- 
 
 The three types of detections  
 
@@ -79,7 +81,7 @@ Vanguards kernel driver uses a whitelist of future dll loading
 
  
 
-When do they load 
+When do they load:
 
 BattlEye and EAC Load when the game is launched 
 
@@ -87,7 +89,7 @@ Vanguard is loaded before most of the system has initialized (boot-start driver)
 
  
 
-Their detections 
+Their detections:
 
 Memory Protection and Scanning 
 
@@ -106,54 +108,7 @@ Behavioral Detection and Telemetry (mouse, ML, IA)
 Anti-VM and Environment Checks 
 
 Hardware Fingerprinting and Ban Enforcement 
- 
 
-The constant battle between cheats and anticheats 
-
-The escalation we have seen over the past decade follows a clear pattern: 
-
-    Usermode cheats were countered by usermode anti-cheat. 
-
-    Kernel cheats were countered by kernel anti-cheat. 
-
-    Kernel cheats with BYOVD were countered by driver blocklists and stricter DSE enforcement. 
-
-    Hypervisor-based cheats were countered by hypervisor detection. 
-
-    DMA cheats are the current frontier, partially countered by IOMMU, Secure Boot, and TPM attestation. 
-
-    The next level is firmware-based attacks, where the cheat is embedded in the SSD firmware, GPU firmware, or NIC firmware. 
- 
- 
- 
-https://x.com/Perpetualmaniac/status/1814376668095754753 
-
- 
-
-Sumario ejecutivo: 
-
-Problema: Los Cheats en videojuegos cada vez se usan más y supone un problema economico y de experiencia de usuario para las empresas y distruidoras de estos. 
-
-A lo largo de los años, se han ido identificando diferentes patrones en los Cheats: 
-     
-
-Cheats que se ejecutan a nivel de  Usermode   
-
-Cheats que se ejecutan a nivel de kernel  
-
-Kernel cheats con BYOVD (con un driver vulnerable modificado) 
-
-Cheats basados en Hypervisor. 
-
-Cheats que utilizan DMA (Acceso directo a la memoria) 
-
-    The next level is firmware-based attacks, where the cheat is embedded in the SSD firmware, GPU firmware, or NIC firmware. 
-
- 
-
-Solución: 
-
-Crear un AntiCheat a nivel de kernel 
 
 Fucionamiento: 
 
@@ -170,6 +125,9 @@ Cuando este ya el cliente en funcionamiento, el anti cheat dentro del kernel ana
 Ni en el anillo 3 ni en el anillo 0 se podrá escribir memoria dentro del juego 
 
 El anticheat hará test especiales para herramientas analíticas, y después de detectar comportamientos sospechosos, baneará la máquina mediante HWID (hardware ID) 
+
+
+
 
 Valor: 
 
